@@ -7,7 +7,7 @@ public class Program
 {
     public static async Task Main()
     {
-        for (var i = 0; i < int.MaxValue; i++)
+        for (var i = 0; i <= int.MaxValue; i++)
         {
             var expressionParser = new ExpressionParser();
 
@@ -20,7 +20,7 @@ public class Program
             if (i % 10000 == 0)
             {
                 // every 10k iterations, gc collect and then log the memory consumption of this process
-                
+
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
                 GC.Collect();
@@ -32,35 +32,25 @@ public class Program
 
     private static void MemoryDetails()
     {
-        // Get the current process
-        var currentProcess = Process.GetCurrentProcess();
-
-        // Retrieve the memory usage
-        var memoryUsed = currentProcess.PrivateMemorySize64;
-
-        // Convert the memory usage to a human-readable format
-        var formattedMemoryUsed = FormatMemory(memoryUsed);
-
-        // Print the memory usage
-        Console.WriteLine($"Memory used: {formattedMemoryUsed}");
-    }
-
-    private static string FormatMemory(long bytes)
-    {
-        const int scale = 1024;
-        string[] memoryUnits =
+        string FormatMemory(long bytes)
         {
-            "B", "KB", "MB", "GB", "TB",
-        };
+            const int scale = 1024;
+            var memoryUnits = new[]
+            {
+                "B", "KB", "MB", "GB", "TB",
+            };
 
-        var i = 0;
-        double memorySize = bytes;
-        while (memorySize >= scale && i < memoryUnits.Length - 1)
-        {
-            memorySize /= scale;
-            i++;
+            var i = 0;
+            var memorySize = bytes;
+            while (memorySize >= scale && i < memoryUnits.Length - 1)
+            {
+                memorySize /= scale;
+                i++;
+            }
+
+            return $"{memorySize:0.##} {memoryUnits[i]}";
         }
-
-        return $"{memorySize:0.##} {memoryUnits[i]}";
+        
+        Console.WriteLine($"Memory used: {FormatMemory(Process.GetCurrentProcess().PrivateMemorySize64)}");
     }
 }
